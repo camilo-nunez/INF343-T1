@@ -1,6 +1,6 @@
 import socket 
 from threading import Thread 
-from SocketServer import ThreadingMixIn
+from socketserver import ThreadingMixIn
 import logging
 
 logging.basicConfig(level=logging.INFO, filename='log.txt', filemode='w', format='%(asctime)s - %(message)s')
