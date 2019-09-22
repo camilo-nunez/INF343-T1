@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+
+    servidor:
+        command: python servidor/servidor.py
+        image: python:latest
+        ports:
+            - "5000:5000"
+        volumes:
+            - ./:/servidor
+        container_name: servidor
+        networks:
+            betweenContainers:
+                ipv4_address: 172.20.0.10
+
+    cliente:
+        command: python cliente/cliente.py
+        image: python:latest
+        container_name: cliente
+        volumes:
+            - ./:/cliente
+        depends_on: 
+            - servidor
+        networks:
+            - betweenContainers
+             
+networks:
+    betweenContainers:
+        ipam:
+            driver: default
+            config:
+            - subnet: 172.20.0.0/16
+            # gateway: 172.20.0.1
+            #iprange?
