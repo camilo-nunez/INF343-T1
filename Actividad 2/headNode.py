@@ -80,7 +80,7 @@ i = 0
 
 def heartbeat():
 	for i in range(len(threads)):
-		data = threads[i].getConn.recv(BUFFER_SIZE).decode("utf-8")
+		data = threads[i].getConn().recv(BUFFER_SIZE).decode("utf-8")
 		if data == "ok":
 			hearbeat.info("thread " + str(i) + " esta vivo")
 		else:
