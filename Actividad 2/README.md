@@ -3,12 +3,9 @@
 * Se usaron los containers de python:latest.
 * Se instaló nano para ver los archivos creados.
 * IP del servidor: 172.20.0.10
-* Se hace toda la configuación en docker-compose, no siendo necesario Dockerfile.
 
 Para ejecutar:
 
 * **$** sudo docker-compose build
-* **$** sudo docker-compose up
-
-Para cerrar servidor: presionar CTRL + C
+* **$** sudo docker-compose up &
 

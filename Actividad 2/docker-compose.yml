@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+
+    headNode:
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python headNode/headNode.py"
+        image: python:latest
+        ports:
+            - "5000:5000"
+        volumes:
+            - ./:/headNode
+        container_name: headNode
+        networks:
+            betweenContainers:
+                ipv4_address: 172.30.0.10
+
+    dataNode1:
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python dataNode/dataNode.py"
+        image: python:latest
+        container_name: dataNode1
+        volumes:
+            - ./:/dataNode
+        depends_on: 
+            - headNode
+        networks:
+            - betweenContainers
+    
+    dataNode2:
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python dataNode/dataNode.py"
+        image: python:latest
+        container_name: dataNode2
+        volumes:
+            - ./:/dataNode
+        depends_on: 
+            - headNode
+        networks:
+            - betweenContainers
+            
+    dataNode3:
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python dataNode/dataNode.py"
+        image: python:latest
+        container_name: dataNode3
+        volumes:
+            - ./:/dataNode
+        depends_on: 
+            - headNode
+        networks:
+            - betweenContainers
+            
+    dataNode4:
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python dataNode/dataNode.py"
+        image: python:latest
+        container_name: dataNode4
+        volumes:
+            - ./:/dataNode
+        depends_on: 
+            - headNode
+        networks:
+            - betweenContainers
+            
+networks:
+    betweenContainers:
+        ipam:
+            driver: default
+            config:
+            - subnet: 172.30.0.0/16
+            # gateway: 172.20.0.1
+            #iprange?

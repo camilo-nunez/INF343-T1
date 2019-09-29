@@ -1,9 +1,23 @@
 import socket 
-from threading import Thread 
+from threading import Thread, Timer
 from socketserver import ThreadingMixIn
 import logging
 
-logging.basicConfig(level = logging.INFO, filename = 'log.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
+def loggingFactory(nombre, archivo, tipo = logging.INFO):
+	handler = logging.FileHandler(archivo)
+	formato = logging.Formatter('%(asctime)s - %(message)s')
+	handler.setFormatter(formato)
+	
+	logger = logging.getLogger(nombre)
+	logger.setLevel(tipo)
+	logger.addHandler(handler)
+	
+	return logger
+
+registro = loggingFactory("registro", "registro_server.txt")
+hearbeat = loggingFactory("hearbeat", "hearbeat_server.txt")
+# logging.basicConfig(level = logging.INFO, filename = 'registro_server.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
+# logging.basicConfig(level = logging.INFO, filename = 'hearbeat_server.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
 bufferSize = 1024
 # ServerThread: servidor con PoolThread para multiples clientes
@@ -36,12 +50,13 @@ class ServerThread(Thread):
         logging.info(data)
         print(data)
         
-        self.conn.send(data  + " recibido.")
-        
         cerrando = "Cerrando conexion."
         logging.info(cerrando)
         print(cerrando)
-
+        
+    def getConn(self):
+        return self.conn
+		
 # Servidor multithread
 
 IP = socket.gethostbyname(socket.gethostname()) 
@@ -57,13 +72,24 @@ serverSocket.bind((IP, PORT))
 threads = list()
 
 # se aceptan 100 conexiones simultaneas
-serverSocket.listen(100)
+serverSocket.listen(4)
 esperando = "Esperando clientes"
 logging.info(esperando)
 print(esperando)
 i = 0
 
-while True:
+def heartbeat():
+	for i in range(len(threads)):
+		data = threads[i].getConn.recv(BUFFER_SIZE).decode("utf-8")
+		if data == "ok":
+			hearbeat.info("thread " + str(i) + " esta vivo")
+		else:
+			hearbeat.info("thread " + str(i) + " no disponible")
+
+hearbeatTimer = Timer(5, heartbeat)
+hearbeatTimer.start()
+
+while i < 4 :
 	
     (conn, (ip, port)) = serverSocket.accept()
     
@@ -71,8 +97,6 @@ while True:
     newServerThread = ServerThread(ip, port, conn)
     newServerThread.start()
     
-    # esperar hasta que cada serverThread termine
-    # newServerThread.join()
     threads.append(newServerThread)
     i += 1
 

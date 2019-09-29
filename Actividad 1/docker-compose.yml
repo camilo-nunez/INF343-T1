@@ -3,7 +3,10 @@ version: '3'
 services:
 
     servidor:
-        command: python servidor/servidor.py &
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python servidor/servidor.py"
         image: python:latest
         ports:
             - "5000:5000"
@@ -15,7 +18,10 @@ services:
                 ipv4_address: 172.20.0.10
 
     cliente:
-        command: python cliente/cliente.py &
+        command: bash -c "
+            apt-get update -y && 
+            apt-get install -y nano && 
+            python cliente/cliente.py"
         image: python:latest
         container_name: cliente
         volumes:

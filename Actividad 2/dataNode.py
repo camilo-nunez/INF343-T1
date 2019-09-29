@@ -1,10 +1,10 @@
 import socket
 import logging
 
-logging.basicConfig(level = logging.INFO, filename = 'respuestas.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
+logging.basicConfig(level = logging.INFO, filename = 'registro_cliente.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
 # obtiene IP propia
-host = "172.20.0.10"
+host = "172.30.0.10"
 port = 5000
 bufferSize = 1024
 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
