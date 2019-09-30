@@ -59,20 +59,6 @@ services:
         networks:
             - betweenContainers
             
-    dataNode4:
-        command: bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
-            python dataNode/dataNode.py"
-        image: python:latest
-        container_name: dataNode4
-        volumes:
-            - ./:/dataNode
-        depends_on: 
-            - headNode
-        networks:
-            - betweenContainers
-            
 networks:
     betweenContainers:
         ipam:

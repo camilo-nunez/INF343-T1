@@ -1,8 +1,9 @@
-# Actividad 1
+# Actividad 2
 
 * Se usaron los containers de python:latest.
 * Se instaló nano para ver los archivos creados.
-* IP del servidor: 172.20.0.10
+* IP del servidor: 172.30.0.10
+* Puerto para multicast: 6000
 
 Para ejecutar:
 
