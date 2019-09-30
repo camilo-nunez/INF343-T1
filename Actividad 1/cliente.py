@@ -3,7 +3,7 @@ import logging
 
 logging.basicConfig(level = logging.INFO, filename = 'respuestas.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
-# obtiene IP propia
+# IP servidor
 host = "172.20.0.10"
 port = 5000
 bufferSize = 1024
@@ -20,10 +20,11 @@ logging.info(data)
 print(data)
 
 # mensaje 1
-cliente.send(b"mensaje 1")
+cliente.send(b"saludos")
 print("Se envió mensaje 1.")
 
-print("Cerrando cliente...")
+while data != "cerrando conexion":
+	data = cliente.recv(bufferSize).decode("utf-8")
+	cliente.info("se recibio:" + data)
 
-# cierre de socket
-cliente.close()
+cliente.info("adios")

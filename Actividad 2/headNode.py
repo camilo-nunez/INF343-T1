@@ -47,7 +47,7 @@ class ServerThread(Thread):
 			data = conn.recv(bufferSize).decode("utf-8")
 			eleccionData = random.randInt(len(threads))
 			
-			while threads[i].getConn() == self.conn:
+			while threads[eleccionData].getConn() != self.conn:
 				
 			print(data)
 			logging.info(data)
@@ -80,7 +80,6 @@ multi.settimeout(1)
 ttl = struct.pack('b', 1)
 multi.setsockpot(socket.IPPROTO_IP,socket.IP_MULTICAST_TTL, ttl)
 
-multi.sendto("hearbeat", multicastGroup)
 
 # Server Tipo TCP
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -98,20 +97,30 @@ serverSocket.listen(3)
 esperando = "Esperando dataNodes"
 registro.info(esperando)
 print(esperando)
-"""
+
 def heartbeat():
-	for i in range(len(threadsMensajes)):
-		data = threads[i].getConn().recv(BUFFER_SIZE).decode("utf-8")
-		if data == "ok":
-			hearbeat.info("thread " + str(i) + " esta vivo")
+	sent = multi.sendto("hearbeat", multicastGroup)
+	dataNodes = []
+	
+	while True:
+		try:
+			data, server = sock.recvfrom(16) # ver que es el 16
+			dataNodes.append(server)
+		except socket.timeout:
+			print("timeout")
 		else:
-			hearbeat.info("thread " + str(i) + " no disponible")
-"""
+			hearbeat.info(data + " de " + data + " " + server + "no disponible")
+			
+	for i in range(len(threads)):
+		ip = dataNodes[i].split(":")[0]
+		
+		if not ip in dataNodes:
+			hearbeat.info(data + " de " + data + " " + server + "no disponible")
+			
 hearbeatTimer = Timer(5, heartbeat)
 hearbeatTimer.start()
 
 while True :
-	
     (conn, (ip, port)) = serverSocket.accept()
     
     # se crea nuevo ServerThread 
