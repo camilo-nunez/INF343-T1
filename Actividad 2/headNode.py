@@ -28,58 +28,71 @@ class ServerThread(Thread):
         self.conn = conn
         
         # registra nuevo SeverThread en registro_server.txt
-        info = "Se crea ServerThread para cliente con IP " + ip + ":" + str(port)
-        registro.info(info)
-        print(info)
- 
+        inicio = "Se crea ServerThread para cliente con IP " + ip + " puerto " + str(port)
+        registro.info(inicio)
+        print(inicio)
+ 		
     def run(self):
-        # Recibe el mensaje de conexion
+		
+        # handshake 3 pasos
         data = self.conn.recv(bufferSize).decode("utf-8")
         logging.info(data)
         print("Mensaje recibido: " + data)
 
-        # Confirma la conexion
         self.conn.send(b"confirmacion")
         print("Se envia confirmacion")
 		
-		# Recibe mensajes
-		while True:
-			data = conn.recv(bufferSize).decode("utf-8")
-			eleccionData = random.randInt(len(threads))
+        data = self.conn.recv(bufferSize).decode("utf-8")
+
+        if data == "ok":
+            
+            # Recibe mensajes
+            while True:
+                data = self.conn.recv(bufferSize).decode("utf-8")
+
+                eleccionData = random.randint(0, len(threads))
+
+                while threads[eleccionData].getConn() == self.conn:
+                    eleccionData = random.randint(0, len(threads))
+
+                nodeAndData = str(threads[eleccionData].getConn()) + " " + data
+                threads[eleccionData].getConn().send(nodeAndData.encode("utf-8"))
+
+                print("Mensaje ya distribuido: " + data)
+                registro.info(str(threads[eleccionData].getIP()) + data)
+
+                # respuesta si se recibio
+                data = threads[eleccionData].getConn().recv(bufferSize).decode("utf-8")
+
+                if data == "recibido":
+                    registro.info("registro de data:" + data + " - realizado correctamente") 
 			
-			while threads[eleccionData].getConn() != self.conn:
-				
-			print(data)
-			logging.info(data)
-        
-        cerrando = "Cerrando conexion."
-        logging.info(cerrando)
-        print(cerrando)
-        
     def getConn(self):
         return self.conn
-		
-# Servidor multithread
+        
+    def getIP(self):
+        return self.IP
+
+# registros
 registro = loggingFactory("registro", "registro_server.txt")
 hearbeat = loggingFactory("hearbeat", "hearbeat_server.txt")
 
+# variables
 bufferSize = 1024
-
 IP = socket.gethostbyname(socket.gethostname()) 
 PORT = 5000
-BUFFER_SIZE = 1024  # cambiar en caso de que se quiera
+threads = list()
+socketsAndMensajes = dict()
 
 # multicast
 multicastGroup = "172.30.0.0"
 multicastPort = 6000
 
 multi = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+multi.bind(('', multicastPort))
 multi.settimeout(1)
-
 ttl = struct.pack('b', 1)
-multi.setsockpot(socket.IPPROTO_IP,socket.IP_MULTICAST_TTL, ttl)
-
+multi.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
 # Server Tipo TCP
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -88,46 +101,41 @@ print("Socket de Servidor iniciado.")
 #server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 serverSocket.bind((IP, PORT))
 
-threadsMensajes = list()
-
-socketsAndMensajes = dict()
-
 # se aceptan 100 conexiones simultaneas
-serverSocket.listen(3)
+serverSocket.listen(100)
 esperando = "Esperando dataNodes"
 registro.info(esperando)
 print(esperando)
 
 def heartbeat():
-	sent = multi.sendto("hearbeat", multicastGroup)
-	dataNodes = []
+    h = b"heartbeat"
+    sent = multi.sendto((h, multicastGroup))
+    dataNodes = []
 	
-	while True:
-		try:
-			data, server = sock.recvfrom(16) # ver que es el 16
-			dataNodes.append(server)
-		except socket.timeout:
-			print("timeout")
-		else:
-			hearbeat.info(data + " de " + data + " " + server + "no disponible")
+    while True:
+        try:
+            data, server = sock.recvfrom(1024)
+            if data == "ok":
+                dataNodes.append(server[0])
 			
-	for i in range(len(threads)):
-		ip = dataNodes[i].split(":")[0]
-		
-		if not ip in dataNodes:
-			hearbeat.info(data + " de " + data + " " + server + "no disponible")
-			
+        except socket.timeout:
+            break
+
+    for i in range(len(threads)):
+        if not dataNodes[i] in dataNodes:
+            hearbeat.info("data: " + data + " de " + server + "no disponible")
+        else:
+            hearbeat.info("data: " + data + " de " + server + "disponible")
+
 hearbeatTimer = Timer(5, heartbeat)
 hearbeatTimer.start()
 
+# se esperan dataNodes
 while True :
     (conn, (ip, port)) = serverSocket.accept()
     
     # se crea nuevo ServerThread 
     newServerThread = ServerThread(ip, port, conn)
     newServerThread.start()
-    
+
     threads.append(newServerThread)
-
-# serverSocket.close()
-
