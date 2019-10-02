@@ -4,8 +4,6 @@ services:
 
     servidor:
         command: bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python servidor/servidor.py"
         image: python:latest
         ports:
@@ -19,8 +17,6 @@ services:
 
     cliente:
         command:  bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python cliente/cliente.py"
         image: python:latest
         container_name: cliente

@@ -56,7 +56,8 @@ class ReceiveThread(Thread):
                 dataNode.send(b"registrado")
 
 # registros
-registroData = loggingFactory("data", "data.txt")
+# registroData = loggingFactory("data", "/dataNode/data"+socket.gethostbyname(socket.gethostname())+".txt")
+registroData = loggingFactory("data", "/dataNode/data.txt")
 
 # variables
 host = "172.30.0.10"

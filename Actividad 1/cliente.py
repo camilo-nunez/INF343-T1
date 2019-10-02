@@ -3,7 +3,7 @@ import logging
 import random
 from threading import Timer
 # se crea respuestas.txt
-logging.basicConfig(level = logging.INFO, filename = 'respuestas.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
+logging.basicConfig(level = logging.INFO, filename = '/cliente/respuestas.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
 # IP servidor
 host = "172.20.0.10"

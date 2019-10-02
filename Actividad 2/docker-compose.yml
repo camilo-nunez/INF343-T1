@@ -4,8 +4,6 @@ services:
 
     headNode:
         command: bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python headNode/headNode.py"
         image: python:latest
         ports:
@@ -19,8 +17,6 @@ services:
 
     dataNode1:
         command:  bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python dataNode/dataNode.py"
         image: python:latest
         container_name: dataNode1
@@ -33,8 +29,6 @@ services:
     
     dataNode2:
         command:  bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python dataNode/dataNode.py"
         image: python:latest
         container_name: dataNode2
@@ -47,8 +41,6 @@ services:
             
     dataNode3:
         command:  bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python dataNode/dataNode.py"
         image: python:latest
         container_name: dataNode3
@@ -61,8 +53,6 @@ services:
             
     cliente:
         command:  bash -c "
-            apt-get update -y && 
-            apt-get install -y nano && 
             python cliente/cliente.py"
         image: python:latest
         container_name: cliente
