@@ -16,6 +16,10 @@ def loggingFactory(nombre, archivo, tipo = logging.INFO):
 
     return logger
 
+# registros
+# registroData = loggingFactory("data", "/dataNode/dataNode_"+socket.gethostbyname(socket.gethostname())+".txt")
+registroData = loggingFactory("data", "/dataNode/dataNode.txt")
+
 # thread que respondera a los hearbeat del headNode
 """class HeartThread(Thread): 
  
@@ -49,15 +53,13 @@ class ReceiveThread(Thread):
             # si es data de otro
             if data.split(" ")[0] == "another":
                 registroData.info(data.split(" ", 1)[1])
+                registroData.info("recibido")
                 dataNode.send(b"recibido")
             # si es donde quedo la data enviada por este
             else:
-                registroCliente.info(data)
+                registroData.info(data)
+                registroData.info("registrado")
                 dataNode.send(b"registrado")
-
-# registros
-# registroData = loggingFactory("data", "/dataNode/data"+socket.gethostbyname(socket.gethostname())+".txt")
-registroData = loggingFactory("data", "/dataNode/data.txt")
 
 # variables
 host = "172.30.0.10"
@@ -73,8 +75,8 @@ dataNode.send(b"peticion")
 data = dataNode.recv(bufferSize).decode("utf-8")
 
 if data != "confirmacion":
-    registroCliente.info("Servidor no conecta.")
-    cliente.close()
+    registroData.info("Servidor no conecta.")
+    data.close()
     exit(0)
 
 # registrodata.info(data)
