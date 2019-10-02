@@ -1,6 +1,8 @@
 import socket
 import logging
-
+import random
+from threading import Timer
+# se crea respuestas.txt
 logging.basicConfig(level = logging.INFO, filename = 'respuestas.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
 # IP servidor
@@ -19,12 +21,14 @@ data = cliente.recv(bufferSize).decode("utf-8")
 logging.info(data)
 print(data)
 
-# mensaje 1
-cliente.send(b"saludos")
-print("Se envió mensaje 1.")
+# se envian como mensajes numeros random
+def randomMSG():
+    Timer(3.0, randomMSG).start()
+    numero = random.randint(0, 100)
+    msg = "numero random: " + str(numero)
+    cliente.send(msg.encode("utf-8"))
 
-while data != "cerrando conexion":
-	data = cliente.recv(bufferSize).decode("utf-8")
-	cliente.info("se recibio:" + data)
+    data = cliente.recv(bufferSize).decode("utf-8")
+    logging.info("Servidor recibio: " + data)
 
-cliente.info("adios")
+randomMSG()
