@@ -7,10 +7,9 @@
 * Dirección de multicast: *224.1.1.1*
 * Directorio de todos los registros: */*
 * Para ver los archivos:
-    * docker cp container:/directorioContainer directorio-suyo
-    * opción: tail -f archivo
+    * opción: ```tail -f {registro_server.txt,hearbeat_server.txt,dataNode.txt,registro_cliente.txt}```
 
 Para ejecutar:
 
-* **$** sudo docker-compose build
-* **$** sudo docker-compose up
+* **$** ```sudo docker-compose build```
+* **$** ```sudo docker-compose up```

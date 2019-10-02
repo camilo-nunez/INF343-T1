@@ -4,7 +4,7 @@ import random
 from threading import Timer
 
 # se crea registro_cliente.txt
-logging.basicConfig(level = logging.INFO, filename = 'registro_cliente.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
+logging.basicConfig(level = logging.INFO, filename = '/cliente/registro_cliente.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
 # IP servidor
 host = "172.30.0.10"

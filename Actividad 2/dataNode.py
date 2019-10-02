@@ -16,6 +16,10 @@ def loggingFactory(nombre, archivo, tipo = logging.INFO):
 
     return logger
 
+# registros
+# registroData = loggingFactory("data", "/dataNode/dataNode_"+socket.gethostbyname(socket.gethostname())+".txt")
+registroData = loggingFactory("data", "/dataNode/dataNode.txt")
+
 # thread que respondera a los hearbeat del headNode
 """class HeartThread(Thread): 
  
@@ -45,18 +49,19 @@ class ReceiveThread(Thread):
         while True:
             # mensaje de otro
             data = dataNode.recv(bufferSize).decode("utf-8")
+
+            registroData.info(str(data))
             
             # si es data de otro
             if data.split(" ")[0] == "another":
                 registroData.info(data.split(" ", 1)[1])
+                registroData.info("recibido")
                 dataNode.send(b"recibido")
             # si es donde quedo la data enviada por este
             else:
-                registroCliente.info(data)
+                registroData.info(data)
+                registroData.info("registrado")
                 dataNode.send(b"registrado")
-
-# registros
-registroData = loggingFactory("data", "data.txt")
 
 # variables
 host = "172.30.0.10"
@@ -67,16 +72,19 @@ bufferSize = 1024
 dataNode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dataNode.connect( (host, port) )
 
+registroData.info('Conexion establecida con '+ str(dataNode.getsockname())+' y '+str(dataNode.getpeername()))
+
+
 # handshake 3 pasos
 dataNode.send(b"peticion")
 data = dataNode.recv(bufferSize).decode("utf-8")
 
 if data != "confirmacion":
-    registroCliente.info("Servidor no conecta.")
-    cliente.close()
+    registroData.info("Servidor no conecta.")
+    data.close()
     exit(0)
 
-# registrodata.info(data)
+registroData.info(data)
 dataNode.send(b"dataNode")
 
 # entrada para el usuario

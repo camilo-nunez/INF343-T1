@@ -81,8 +81,8 @@ class ClientThread(Thread):
         return self.ip
         
 # registros
-registro = loggingFactory("registro", "registro_server.txt")
-hearbeat = loggingFactory("hearbeat", "hearbeat_server.txt")
+registro = loggingFactory("registro", "/headNode/registro_server.txt")
+hearbeat = loggingFactory("hearbeat", "/headNode/hearbeat_server.txt")
 
 # variables
 bufferSize = 1024

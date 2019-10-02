@@ -4,7 +4,7 @@ from socketserver import ThreadingMixIn
 import logging
 
 # se crea log.txt
-logging.basicConfig(level = logging.INFO, filename = 'log.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
+logging.basicConfig(level = logging.INFO, filename = '/servidor/log.txt', filemode = 'w', format = '%(asctime)s - %(message)s')
 
 bufferSize = 1024
 
@@ -30,7 +30,7 @@ class ServerThread(Thread):
         print("Mensaje recibido: " + data)
 
         # Confirma la conexion
-        self.conn.send(b"confirmacion")
+        self.conn.send(b"confirmacion, por favor veo los logs")
         
         # se reciben mensajes hasta que se reciba exit
         while True:
