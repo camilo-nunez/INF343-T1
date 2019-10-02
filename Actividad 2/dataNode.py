@@ -49,6 +49,8 @@ class ReceiveThread(Thread):
         while True:
             # mensaje de otro
             data = dataNode.recv(bufferSize).decode("utf-8")
+
+            registroData.info(str(data))
             
             # si es data de otro
             if data.split(" ")[0] == "another":
@@ -70,6 +72,9 @@ bufferSize = 1024
 dataNode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dataNode.connect( (host, port) )
 
+registroData.info('Conexion establecida con '+ str(dataNode.getsockname())+' y '+str(dataNode.getpeername()))
+
+
 # handshake 3 pasos
 dataNode.send(b"peticion")
 data = dataNode.recv(bufferSize).decode("utf-8")
@@ -79,7 +84,7 @@ if data != "confirmacion":
     data.close()
     exit(0)
 
-# registrodata.info(data)
+registroData.info(data)
 dataNode.send(b"dataNode")
 
 # entrada para el usuario

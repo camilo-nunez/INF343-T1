@@ -6,8 +6,6 @@ services:
         command: bash -c "
             python headNode/headNode.py"
         image: python:latest
-        ports:
-            - "5000:5000"
         volumes:
             - ./:/headNode
         container_name: headNode
