@@ -56,15 +56,12 @@ class ReceiveThread(Thread):
                 dataNode.send(b"registrado")
 
 # registros
-registroCliente = loggingFactory("registroCliente", "registro_cliente.txt")
 registroData = loggingFactory("data", "data.txt")
 
 # variables
 host = "172.30.0.10"
 port = 5000
-# heartPort = 6000
 bufferSize = 1024
-# heartAddress = "224.1.1.1"
 
 # socket mensajes
 dataNode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -79,23 +76,11 @@ if data != "confirmacion":
     cliente.close()
     exit(0)
 
-registroCliente.info(data)
-dataNode.send(b"ok")
+# registrodata.info(data)
+dataNode.send(b"dataNode")
 
 # entrada para el usuario
 receiveThread = ReceiveThread()
 receiveThread.start()
 
-# responder al hearbeat
-# heartThread = HeartThread()
-# heartThread.start()
-
-# envian mensajes numeros random
-def randomMSG():
-    Timer(3.0, randomMSG).start()
-    numero = random.randint(0, 100)
-    msg = "numero random: " + str(numero)
-    # se envia mensaje
-    dataNode.send(msg.encode("utf-8"))
-    
-dataNode.close()
+# dataNode.close()
