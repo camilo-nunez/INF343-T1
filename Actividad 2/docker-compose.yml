@@ -10,6 +10,7 @@ services:
         image: python:latest
         ports:
             - "5000:5000"
+            - "6000:6000"
         volumes:
             - ./:/headNode
         container_name: headNode
@@ -28,6 +29,8 @@ services:
             - ./:/dataNode
         depends_on: 
             - headNode
+        ports:
+            - "6001:6000"
         networks:
             - betweenContainers
     
@@ -42,6 +45,8 @@ services:
             - ./:/dataNode
         depends_on: 
             - headNode
+        ports:
+            - "6002:6000"
         networks:
             - betweenContainers
             
@@ -56,6 +61,8 @@ services:
             - ./:/dataNode
         depends_on: 
             - headNode
+        ports:
+            - "6003:6000"
         networks:
             - betweenContainers
             

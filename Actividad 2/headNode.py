@@ -5,18 +5,19 @@ import logging
 import random
 import struct
 import sys
+import os
 
 # crea archivos registro a partir de la clase logging
 def loggingFactory(nombre, archivo, tipo = logging.INFO):
-	handler = logging.FileHandler(archivo)
-	formato = logging.Formatter('%(asctime)s - %(message)s')
-	handler.setFormatter(formato)
-	
-	logger = logging.getLogger(nombre)
-	logger.setLevel(tipo)
-	logger.addHandler(handler)
-	
-	return logger
+    handler = logging.FileHandler(archivo)
+    formato = logging.Formatter('%(asctime)s - %(message)s')
+    handler.setFormatter(formato)
+    
+    logger = logging.getLogger(nombre)
+    logger.setLevel(tipo)
+    logger.addHandler(handler)
+    
+    return logger
 
 # ServerThread: servidor con PoolThread para multiples clientes
 class ServerThread(Thread): 
@@ -30,18 +31,15 @@ class ServerThread(Thread):
         # registra nuevo SeverThread en registro_server.txt
         inicio = "Se crea ServerThread para cliente con IP " + ip + " puerto " + str(port)
         registro.info(inicio)
-        print(inicio)
- 		
+        
     def run(self):
-		
+        
         # handshake 3 pasos
         data = self.conn.recv(bufferSize).decode("utf-8")
         logging.info(data)
-        print("Mensaje recibido: " + data)
 
         self.conn.send(b"confirmacion")
-        print("Se envia confirmacion")
-		
+        
         data = self.conn.recv(bufferSize).decode("utf-8")
 
         if data == "ok":
@@ -55,23 +53,29 @@ class ServerThread(Thread):
                 while threads[eleccionData].getConn() == self.conn:
                     eleccionData = random.randint(0, len(threads))
 
-                nodeAndData = str(threads[eleccionData].getConn()) + " " + data
+                nodeAndData = "another" + str(threads[eleccionData].getConn()) + " " + data
+                
+                # se distribuye
                 threads[eleccionData].getConn().send(nodeAndData.encode("utf-8"))
 
-                print("Mensaje ya distribuido: " + data)
-                registro.info(str(threads[eleccionData].getIP()) + data)
-
-                # respuesta si se recibio
+                registro.info(str(threads[eleccionData].getIP()) + ":" + data)
+                
                 data = threads[eleccionData].getConn().recv(bufferSize).decode("utf-8")
 
+                # se informa
                 if data == "recibido":
-                    registro.info("registro de data:" + data + " - realizado correctamente") 
-			
+                    registro.info("registro de data:" + data + " - realizado correctamente")
+                    msg = data + " distribuido en " + threads[eleccionData].getIP()
+                    self.conn.send(msg.encode("utf-8"))
+                    data = self.conn.recv(bufferSize).decode("utf-8")
+                    if data == "registrado":
+                        registro.info("registrado en origen")
+            
     def getConn(self):
         return self.conn
         
     def getIP(self):
-        return self.IP
+        return self.ip
 
 # registros
 registro = loggingFactory("registro", "registro_server.txt")
@@ -82,53 +86,73 @@ bufferSize = 1024
 IP = socket.gethostbyname(socket.gethostname()) 
 PORT = 5000
 threads = list()
-socketsAndMensajes = dict()
 
 # multicast
-multicastGroup = "172.30.0.0"
-multicastPort = 6000
+# multicastAddress = "224.1.1.1"
+# multicastPort = 6000
 
-multi = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-multi.bind(('', multicastPort))
-multi.settimeout(1)
-ttl = struct.pack('b', 1)
-multi.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+# multi = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# multi.settimeout(0.3)
+#ttl = struct.pack('b', 1)
+# multi.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+# hearbeat.info(str(multi))
 
 # Server Tipo TCP
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Socket de Servidor iniciado.")
 
-#server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 serverSocket.bind((IP, PORT))
 
 # se aceptan 100 conexiones simultaneas
 serverSocket.listen(100)
 esperando = "Esperando dataNodes"
 registro.info(esperando)
-print(esperando)
 
+# heartbeat
 def heartbeat():
-    h = b"heartbeat"
-    sent = multi.sendto((h, multicastGroup))
+    Timer(5.0, heartbeat).start()
+    
+    for i in range(len(threads)):
+        estado = os.system("ping -c 1 " + threads[i].getIP())
+        
+        if estado == 0:
+          hearbeat.info(threads[i].getIP() + " disponible")
+        else:
+          hearbeat.info(threads[i].getIP() + " no disponible, eliminado")
+          threads.remove(threads[i])
+    
+    if len(threads) == 0:
+        registro.info("ya no hay dataNodes")
+        serverSocket.close()
+        exit(0)
+    """
+    hearbeat.info("envio de multicast")
+    sent = multi.sendto(b"heartbeat", (multicastAddress, multicastPort))
     dataNodes = []
-	
+    data = "[vacio]"
+    server = "[vacio]"
+    
     while True:
         try:
-            data, server = sock.recvfrom(1024)
-            if data == "ok":
+            data, server = multi.recvfrom(1024)
+            if data.decode("utf-8") == "ok":
                 dataNodes.append(server[0])
-			
+            
         except socket.timeout:
             break
-
+    
     for i in range(len(threads)):
-        if not dataNodes[i] in dataNodes:
-            hearbeat.info("data: " + data + " de " + server + "no disponible")
-        else:
+        
+        if threads[i].getIP() in dataNodes:
             hearbeat.info("data: " + data + " de " + server + "disponible")
+            
+        else:
+            hearbeat.info("data: " + data + " de " + server + "no disponible")
 
-hearbeatTimer = Timer(5, heartbeat)
-hearbeatTimer.start()
+    hearbeat.info("trampa")"""
+
+# thread de hearbeat cada 5 seg
+heartbeat()
 
 # se esperan dataNodes
 while True :
