@@ -88,7 +88,6 @@ IP = socket.gethostbyname(socket.gethostname())
 PORT = 5000
 threads = list()
 msg = ""
-eleccionData = 0
 
 # Server Tipo TCP
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
