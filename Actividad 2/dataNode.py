@@ -17,28 +17,8 @@ def loggingFactory(nombre, archivo, tipo = logging.INFO):
     return logger
 
 # registros
-# registroData = loggingFactory("data", "/dataNode/dataNode_"+socket.gethostbyname(socket.gethostname())+".txt")
-registroData = loggingFactory("data", "/dataNode/dataNode.txt")
+registroData = loggingFactory("data", "/dataNode/data.txt")
 
-# thread que respondera a los hearbeat del headNode
-"""class HeartThread(Thread): 
- 
-    def __init__(self):
-        Thread.__init__(self)
-
-        heart = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        heart.bind( ('', heartPort) )
-        grupo = socket.inet_aton(heartAddress)
-        mreq = struct.pack('4sL', grupo, socket.INADDR_ANY)
-        heart.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-
-    def run(self):
-        while True:
-            data, direccion = heart.recvfrom(1024)
-            
-            if data.decode("utf-8") == "hearbeat":
-                heart.sendto(b"ok", direccion)
-"""
 # recibe mensajes
 class ReceiveThread(Thread):
     
@@ -47,21 +27,14 @@ class ReceiveThread(Thread):
         
     def run(self):
         while True:
-            # mensaje de otro
+            # mensaje a guardar
             data = dataNode.recv(bufferSize).decode("utf-8")
 
-            registroData.info(str(data))
+            # se registra en data.txt
+            registroData.info(data)
             
-            # si es data de otro
-            if data.split(" ")[0] == "another":
-                registroData.info(data.split(" ", 1)[1])
-                registroData.info("recibido")
-                dataNode.send(b"recibido")
-            # si es donde quedo la data enviada por este
-            else:
-                registroData.info(data)
-                registroData.info("registrado")
-                dataNode.send(b"registrado")
+            # avisa que fue recibido
+            dataNode.send(b"recibido")
 
 # variables
 host = "172.30.0.10"
@@ -72,7 +45,7 @@ bufferSize = 1024
 dataNode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dataNode.connect( (host, port) )
 
-registroData.info('Conexion establecida con '+ str(dataNode.getsockname())+' y '+str(dataNode.getpeername()))
+registroData.info('Conexion establecida con ' + str(dataNode.getsockname()) + ' y ' + str(dataNode.getpeername()))
 
 
 # handshake 3 pasos

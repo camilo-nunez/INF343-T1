@@ -31,31 +31,18 @@ class ServerThread(Thread):
     def run(self):
 
         while True:
+            # se recibe de dataNode
             data = self.conn.recv(bufferSize).decode("utf-8")
 
-            eleccionData = random.randint(0, len(threads))
-
-            while threads[eleccionData].getConn() == self.conn:
-                eleccionData = random.randint(0, len(threads))
-
-            nodeAndData = "another" + str(threads[eleccionData].getConn()) + " " + data
-            
-            # se distribuye
-            threads[eleccionData].getConn().send(nodeAndData.encode("utf-8"))
-
-            registro.info(str(threads[eleccionData].getIP()) + ":" + data)
-            
-            data = threads[eleccionData].getConn().recv(bufferSize).decode("utf-8")
-
-            # se informa
+            # dataNode responde si se registro
             if data == "recibido":
-                registro.info("registro de data:" + data + " - realizado correctamente")
-                msg = data + " distribuido en " + threads[eleccionData].getIP()
-                self.conn.send(msg.encode("utf-8"))
-                data = self.conn.recv(bufferSize).decode("utf-8")
-                if data == "registrado":
-                    registro.info("registrado en origen")
-            
+                registro.info("recibido en dataNode " + threads[eleccionData].getIP())
+                msg = str(threads[eleccionData].getIP()) + " , mensaje: " + data
+                clienteThread.send(msg.encode("utf-8"))
+                
+            else:
+                registro.info("Problema: mensaje no fue guardado en dataNode") 
+                           
     def getConn(self):
         return self.conn
         
@@ -72,8 +59,19 @@ class ClientThread(Thread):
     
     def run(self):
         while True:
+            # recibe mensajes de cliente
             data = self.conn.recv(bufferSize).decode("utf-8")
-    
+            
+            # se elige dataNode random
+            eleccionData = random.randint(0, len(threads))
+            
+            while threads[eleccionData].getConn() == self.conn:
+                eleccionData = random.randint(0, len(threads))
+            
+            # se distribuye
+            msg = "mensaje: " + data
+            threads[eleccionData].getConn().send(msg.encode("utf-8"))
+            
     def getConn(self):
         return self.conn
         
@@ -89,7 +87,7 @@ bufferSize = 1024
 IP = socket.gethostbyname(socket.gethostname()) 
 PORT = 5000
 threads = list()
-
+msg = ""
 # Server Tipo TCP
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Socket de Servidor iniciado.")
@@ -142,4 +140,5 @@ while True :
         newServerThread.start()
         
     elif data == "cliente":
-        ClientThread(ip, port, conn).start()
+        clienteThread = ClientThread(ip, port, conn)
+        clienteThread.start()

@@ -25,12 +25,13 @@ cliente.send(b"cliente")
 
 # se envian como mensajes numeros random
 def randomMSG():
-    Timer(3.0, randomMSG).start()
+    Timer(5.0, randomMSG).start()
     numero = random.randint(0, 100)
     msg = "numero random: " + str(numero)
     cliente.send(msg.encode("utf-8"))
 
+    # espera a que su mensaje sea distribuido
     data = cliente.recv(bufferSize).decode("utf-8")
-    logging.info("Servidor recibio: " + data)
+    logging.info(data)
 
 randomMSG()
