@@ -32,7 +32,6 @@ def randomMSG():
 
     # espera a que su mensaje sea distribuido
     data = cliente.recv(bufferSize).decode("utf-8")
-    logging.info("qwertyui")
     logging.info(data)
 
 randomMSG()

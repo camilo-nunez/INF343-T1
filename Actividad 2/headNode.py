@@ -34,9 +34,8 @@ class ServerThread(Thread):
 
         while True:
             # se recibe de dataNode
-            registro.info("1")
             data = self.conn.recv(bufferSize).decode("utf-8")
-            registro.info("2")
+            
             # dataNode responde si se registro
             if data == "recibido":
                 registro.info("recibido en dataNode " + threads[eleccionData].getIP())
@@ -107,7 +106,7 @@ def heartbeat():
     Timer(5.0, heartbeat).start()
     
     for i in range(len(threads)):
-        estado = os.system("ping -c 1 " + threads[i].getIP())
+        estado = os.system("ping -c 1 > /dev/null " + threads[i].getIP())
         
         if estado == 0:
           hearbeat.info(threads[i].getIP() + " disponible")
