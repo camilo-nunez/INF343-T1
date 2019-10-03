@@ -12,7 +12,7 @@ port = 5000
 bufferSize = 1024
 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-cliente.connect( (host, port) )
+cliente.connect( (host, port) )	
 
 # manda el mensaje de solicitud al servidor
 cliente.send(b"peticion")
@@ -25,13 +25,14 @@ cliente.send(b"cliente")
 
 # se envian como mensajes numeros random
 def randomMSG():
-    Timer(5.0, randomMSG).start()
+    Timer(1.0, randomMSG).start()
     numero = random.randint(0, 100)
     msg = "numero random: " + str(numero)
     cliente.send(msg.encode("utf-8"))
 
     # espera a que su mensaje sea distribuido
     data = cliente.recv(bufferSize).decode("utf-8")
+    logging.info("qwertyui")
     logging.info(data)
 
 randomMSG()

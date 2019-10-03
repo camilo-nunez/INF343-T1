@@ -32,13 +32,14 @@ class ServerThread(Thread):
 
         while True:
             # se recibe de dataNode
+            registro.info("1")
             data = self.conn.recv(bufferSize).decode("utf-8")
-
+            registro.info("2")
             # dataNode responde si se registro
             if data == "recibido":
                 registro.info("recibido en dataNode " + threads[eleccionData].getIP())
                 msg = str(threads[eleccionData].getIP()) + " , mensaje: " + data
-                clienteThread.send(msg.encode("utf-8"))
+                ClientThread.conn.send(msg.encode("utf-8"))
                 
             else:
                 registro.info("Problema: mensaje no fue guardado en dataNode") 
@@ -51,29 +52,27 @@ class ServerThread(Thread):
         
 class ClientThread(Thread): 
  
-    def __init__(self, ip, port, conn):
+    def __init__(self, ip, port, connexion):
         Thread.__init__(self) 
         self.ip = ip 
         self.port = port
-        self.conn = conn
-    
+        conn = connexion
+        self.conexion = conn
+        
     def run(self):
         while True:
             # recibe mensajes de cliente
-            data = self.conn.recv(bufferSize).decode("utf-8")
+            data = self.conexion.recv(bufferSize).decode("utf-8")
             
             # se elige dataNode random
             eleccionData = random.randint(0, len(threads))
-            
-            while threads[eleccionData].getConn() == self.conn:
-                eleccionData = random.randint(0, len(threads))
             
             # se distribuye
             msg = "mensaje: " + data
             threads[eleccionData].getConn().send(msg.encode("utf-8"))
             
     def getConn(self):
-        return self.conn
+        return self.conexion
         
     def getIP(self):
         return self.ip
@@ -88,6 +87,8 @@ IP = socket.gethostbyname(socket.gethostname())
 PORT = 5000
 threads = list()
 msg = ""
+eleccionData = 0
+
 # Server Tipo TCP
 serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("Socket de Servidor iniciado.")
