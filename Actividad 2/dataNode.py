@@ -54,7 +54,7 @@ data = dataNode.recv(bufferSize).decode("utf-8")
 
 if data != "confirmacion":
     registroData.info("Servidor no conecta.")
-    data.close()
+    dataNode.close()
     exit(0)
 
 registroData.info(data)
