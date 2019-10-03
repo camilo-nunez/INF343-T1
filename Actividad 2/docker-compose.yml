@@ -12,6 +12,9 @@ services:
         networks:
             betweenContainers:
                 ipv4_address: 172.30.0.10
+        stdin_open: true
+        tty: true
+
 
     dataNode1:
         command:  bash -c "
@@ -24,6 +27,8 @@ services:
             - headNode
         networks:
             - betweenContainers
+        stdin_open: true
+        tty: true
     
     dataNode2:
         command:  bash -c "
@@ -36,6 +41,8 @@ services:
             - headNode
         networks:
             - betweenContainers
+        stdin_open: true
+        tty: true
             
     dataNode3:
         command:  bash -c "
@@ -48,6 +55,8 @@ services:
             - headNode
         networks:
             - betweenContainers
+        stdin_open: true
+        tty: true
             
     cliente:
         command:  bash -c "
@@ -60,6 +69,8 @@ services:
             - headNode
         networks:
             - betweenContainers
+        stdin_open: true
+        tty: true
 
 networks:
     betweenContainers:
