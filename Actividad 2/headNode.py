@@ -7,6 +7,8 @@ import struct
 import sys
 import os
 
+global eleccionData
+
 # crea archivos registro a partir de la clase logging
 def loggingFactory(nombre, archivo, tipo = logging.INFO):
     handler = logging.FileHandler(archivo)
@@ -39,7 +41,7 @@ class ServerThread(Thread):
             if data == "recibido":
                 registro.info("recibido en dataNode " + threads[eleccionData].getIP())
                 msg = str(threads[eleccionData].getIP()) + " , mensaje: " + data
-                ClientThread.conn.send(msg.encode("utf-8"))
+                conn.send(msg.encode("utf-8"))
                 
             else:
                 registro.info("Problema: mensaje no fue guardado en dataNode") 
